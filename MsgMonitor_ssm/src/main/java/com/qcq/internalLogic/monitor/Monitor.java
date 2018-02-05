@@ -36,6 +36,7 @@ public class Monitor extends HttpServlet implements Runnable{
 	//s e p e r a t o r
 	Map<String,Object> parseResult=null;
 	int items;
+	int i=1;
 	Parser parser=new ParserImpl();
 	ApplicationContext ctx=new ClassPathXmlApplicationContext("applicationContext.xml");
 	SignalMapper signalMapper=ctx.getBean(SignalMapper.class);
@@ -43,9 +44,7 @@ public class Monitor extends HttpServlet implements Runnable{
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
-			buf=new byte[2048];
 			ds=new DatagramSocket(port);
-			dp=new DatagramPacket(buf, buf.length);
 			System.out.println("monitor is online, waiting for data...");
 //			test to send something
 			String strSend="hello world";
@@ -54,37 +53,42 @@ public class Monitor extends HttpServlet implements Runnable{
 			ds.send(send);
 			while(true){
 					
+				buf=new byte[1024];
+				dp=new DatagramPacket(buf, buf.length);
 					ds.receive(dp);
 //					System.out.println("from client:");
 					strReceive=new String(dp.getData(),"gb2312");
 					strReceive=strReceive.trim();
-					//会出现;;
+					//出现;;
 					System.out.println("receive data: "+strReceive);
 					if(strReceive.indexOf("？")!=-1||strReceive.indexOf("?")!=-1){
 						System.out.println("存在问号?");
-						dp.setLength(2048);
+						dp.setLength(1024);
 						continue;
 					}
 					if(strReceive!=null){
 						strReceive=strReceive.replaceAll(";;", ";");
 						this.receive(strReceive);
+						System.out.println("执行第"+(i++)+"次 receive();");
 					}
-//					String strReceive=new String(dp.getData(),0,dp.getLength())+" from "+dp.getAddress().getHostAddress()+":"+dp.getPort();
+
+					//					String strReceive=new String(dp.getData(),0,dp.getLength())+" from "+dp.getAddress().getHostAddress()+":"+dp.getPort();
 //					System.out.println(strReceive);
 					
 //					String strSend="client respond";
 //					DatagramPacket send=new DatagramPacket(strSend.getBytes(), strSend.length(), dp.getAddress(),8080);
 //					ds.send(send);
 					
-					
-					dp.setLength(2048);
+//					dp.setLength(1024);
 			}
 			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}finally{
 			ds.close();
+			System.out.println("退出while循环.................");
 		}
+		System.out.println("退出while循环.................");
 	}
 	public static void main(String[] args) {
 		Thread t=new Thread(new Monitor());

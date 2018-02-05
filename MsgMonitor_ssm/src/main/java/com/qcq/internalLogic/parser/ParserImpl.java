@@ -61,6 +61,10 @@ public class ParserImpl implements Parser{
 						break;
 				}catch(IndexOutOfBoundsException e){
 					System.out.println("index out of bounds");
+					return null;
+				}catch(NumberFormatException e){
+					System.out.println("number format exception");
+					return null;
 				}
 			}
 			result.put("devices", devices);
