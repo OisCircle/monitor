@@ -43,7 +43,7 @@ public class Monitor extends HttpServlet implements Runnable{
 	public void run() {
 		// TODO Auto-generated method stub
 		try {
-			buf=new byte[1024];
+			buf=new byte[2048];
 			ds=new DatagramSocket(port);
 			dp=new DatagramPacket(buf, buf.length);
 			System.out.println("monitor is online, waiting for data...");
@@ -56,12 +56,19 @@ public class Monitor extends HttpServlet implements Runnable{
 					
 					ds.receive(dp);
 //					System.out.println("from client:");
-					strReceive=new String(dp.getData());
+					strReceive=new String(dp.getData(),"gb2312");
 					strReceive=strReceive.trim();
-					strReceive=strReceive.replaceAll(";;", ";");
+					//会出现;;
 					System.out.println("receive data: "+strReceive);
-					if(strReceive!=null)
+					if(strReceive.indexOf("？")!=-1||strReceive.indexOf("?")!=-1){
+						System.out.println("存在问号?");
+						dp.setLength(2048);
+						continue;
+					}
+					if(strReceive!=null){
+						strReceive=strReceive.replaceAll(";;", ";");
 						this.receive(strReceive);
+					}
 //					String strReceive=new String(dp.getData(),0,dp.getLength())+" from "+dp.getAddress().getHostAddress()+":"+dp.getPort();
 //					System.out.println(strReceive);
 					
@@ -70,7 +77,7 @@ public class Monitor extends HttpServlet implements Runnable{
 //					ds.send(send);
 					
 					
-					dp.setLength(1024);
+					dp.setLength(2048);
 			}
 			
 		} catch (Exception e) {

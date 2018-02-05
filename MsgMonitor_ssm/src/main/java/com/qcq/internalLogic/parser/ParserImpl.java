@@ -45,19 +45,23 @@ public class ParserImpl implements Parser{
 			List<Device> devices=new ArrayList<Device>();
 			List<Seeker_device> seeker_devices=new ArrayList<Seeker_device>();
 			while(true){
-				sub=str.substring(0, str.indexOf(sep));
-				str=str.substring(str.indexOf(sep)+1);
-				String mac=sub.substring(0, sub.indexOf(","));
-				sub=sub.substring(sub.indexOf(",")+1);
-				sub=sub.substring(sub.indexOf(",")+1);
-				int rssi=Integer.valueOf(sub.substring(0, sub.indexOf(",")));
-				
-				seeker_devices.add(new Seeker_device(seeker.getId(), mac));
-				devices.add(new Device(mac));
-				signals.add(new Signal(-1,mac, rssi,null));
-				
-				if(str.length()<=1||str.equals("")||str.equals("\r\n"))
-					break;
+				try{
+					sub=str.substring(0, str.indexOf(sep));
+					str=str.substring(str.indexOf(sep)+1);
+					String mac=sub.substring(0, sub.indexOf(","));
+					sub=sub.substring(sub.indexOf(",")+1);
+					sub=sub.substring(sub.indexOf(",")+1);
+					int rssi=Integer.valueOf(sub.substring(0, sub.indexOf(",")));
+					
+					seeker_devices.add(new Seeker_device(seeker.getId(), mac));
+					devices.add(new Device(mac));
+					signals.add(new Signal(-1,mac, rssi,null));
+					
+					if(str.length()<=1||str.equals("")||str.equals("\r\n"))
+						break;
+				}catch(IndexOutOfBoundsException e){
+					System.out.println("index out of bounds");
+				}
 			}
 			result.put("devices", devices);
 			result.put("seeker_devices", seeker_devices);
